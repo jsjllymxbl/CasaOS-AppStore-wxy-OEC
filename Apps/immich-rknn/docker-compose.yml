@@ -1,0 +1,206 @@
+# Configuration for big-bear-immich-rknn setup
+name: big-bear-immich-rknn
+
+# Service definitions for the big-bear-immich application
+services:
+  # Main Immich Server service configuration
+  immich-server:
+    container_name: immich-server # Name of the running container
+    image: ghcr.io/immich-app/immich-server:v1.140.1 # Image to be used
+    # extends:
+    #   file: hwaccel.transcoding.yml
+    #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
+    security_opt: # enables full access to /sys and /proc, still far better than privileged: true
+      - systempaths=unconfined
+      - apparmor=unconfined
+    group_add:
+      - video
+    devices:
+      - /dev/rga:/dev/rga
+      - /dev/dri:/dev/dri
+      - /dev/dma_heap:/dev/dma_heap
+      - /dev/mpp_service:/dev/mpp_service
+      #- /dev/mali0:/dev/mali0 # only required to enable OpenCL-accelerated HDR -> SDR tonemapping
+    ports: # Mapping ports from the host OS to the container
+      - 2283:2283
+    volumes: # Mounting directories for persistent data storage
+      - /DATA/AppData/$AppID/upload:/usr/src/app/upload
+      #- /etc/OpenCL:/etc/OpenCL:ro # only required to enable OpenCL-accelerated HDR -> SDR tonemapping
+      #- /usr/lib/aarch64-linux-gnu/libmali.so.1:/usr/lib/aarch64-linux-gnu/libmali.so.1:ro # only required to enable OpenCL-accelerated HDR -> SDR tonemapping
+    environment: # Setting environment variables
+      DB_HOSTNAME: immich-postgres
+      DB_USERNAME: casaos
+      DB_PASSWORD: casaos
+      DB_DATABASE_NAME: immich
+      DB_PORT: "5432"
+      REDIS_HOSTNAME: immich-redis
+      IMMICH_MACHINE_LEARNING_URL: http://immich-machine-learning:3003
+    depends_on: # Dependencies to ensure the order of service startup
+      - redis
+      - database
+    restart: unless-stopped # Policy to restart unless stopped
+
+    # Networks to be attached to the container
+    networks:
+      - big_bear_immich_network
+
+    x-casaos: # CasaOS specific configuration
+      envs:
+        - container: DB_HOSTNAME
+          description:
+            en_us: "Database Hostname"
+        - container: DB_USERNAME
+          description:
+            en_us: "Database Username"
+        - container: DB_PASSWORD
+          description:
+            en_us: "Database Password"
+        - container: DB_DATABASE_NAME
+          description:
+            en_us: "Database Name"
+        - container: DB_PORT
+          description:
+            en_us: "Database Port"
+        - container: REDIS_HOSTNAME
+          description:
+            en_us: "Redis Hostname"
+        - container: IMMICH_MACHINE_LEARNING_URL
+          description:
+            en_us: "Immich Machine Learning URL"
+      volumes:
+        - container: /usr/src/app/upload
+          description:
+            en_us: "Container Path: /usr/src/app/upload"
+      ports:
+        - container: "2283"
+          description:
+            en_us: "Container Port: 2283"
+
+  # Configuration for Immich Machine Learning service
+  immich-machine-learning:
+    container_name: immich-machine-learning # Name of the running container
+    image: ghcr.io/immich-app/immich-machine-learning:v1.140.1-rknn # Image to be used
+    security_opt:
+      - systempaths=unconfined
+      - apparmor=unconfined
+    devices:
+      - /dev/dri:/dev/dri
+    volumes: # Mounting directories for persistent data storage
+      - /DATA/AppData/$AppID/model-cache:/cache
+    environment: # Setting environment variables
+      DB_HOSTNAME: immich-postgres
+      DB_USERNAME: casaos
+      DB_PASSWORD: casaos
+      DB_DATABASE_NAME: casaos
+      DB_PORT: 5432
+      REDIS_HOSTNAME: immich-redis
+      MACHINE_LEARNING_RKNN: True
+      MACHINE_LEARNING_RKNN_THREADS: 1
+    restart: unless-stopped # Policy to restart unless stopped
+
+    # Networks to be attached to the container
+    networks:
+      - big_bear_immich_network # Connects the container to a defined network
+
+    x-casaos: # CasaOS specific configuration
+      envs:
+        - container: DB_HOSTNAME
+          description:
+            en_us: "Database Hostname"
+        - container: DB_USERNAME
+          description:
+            en_us: "Database Username"
+        - container: DB_PASSWORD
+          description:
+            en_us: "Database Password"
+        - container: DB_DATABASE_NAME
+          description:
+            en_us: "Database Name"
+        - container: DB_PORT
+          description:
+            en_us: "Database Port"
+        - container: REDIS_HOSTNAME
+          description:
+            en_us: "Redis Hostname"
+        - container: MACHINE_LEARNING_RKNN
+          description:
+            en_us: "Enable RKNN hardware acceleration if supported"
+        - container: MACHINE_LEARNING_RKNN_THREADS
+          description:
+            en_us: "How many threads of RKNN runtime should be spinned up while inferencing."
+      volumes:
+        - container: /cache
+          description:
+            en_us: "Container Path: /cache"
+
+  # Configuration for Redis service
+  redis:
+    container_name: immich-redis # Name of the running container
+    image: redis:6.2-alpine@sha256:70a7a5b641117670beae0d80658430853896b5ef269ccf00d1827427e3263fa3 # Image to be used
+    restart: always # Policy to always restart the container if it stops
+    networks:
+      - big_bear_immich_network # Connects the container to a defined network
+
+  # Configuration for Database service
+  database:
+    container_name: immich-postgres # Name of the running container
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.3.0-pgvectors0.2.0 # Image to be used
+    environment: # Setting environment variables
+      POSTGRES_PASSWORD: casaos
+      POSTGRES_USER: casaos
+      POSTGRES_DB: immich
+      PG_DATA: /var/lib/postgresql/data
+      # Uncomment the DB_STORAGE_TYPE: 'HDD' var if your database isn't stored on SSDs
+      # DB_STORAGE_TYPE: 'HDD'
+    volumes: # Mounting directories for persistent data storage
+      - /DATA/AppData/$AppID/pgdata:/var/lib/postgresql/data
+    restart: unless-stopped # Policy to always restart the container if it stops
+
+    # CasaOS specific configuration for the database service
+    networks:
+      - big_bear_immich_network # Connects the container to a defined network
+
+    x-casaos: # CasaOS specific configuration
+      envs:
+        - container: POSTGRES_PASSWORD
+          description:
+            en_us: "Database Password"
+        - container: POSTGRES_USER
+          description:
+            en_us: "Database Username"
+        - container: POSTGRES_DB
+          description:
+            en_us: "Database Name"
+        - container: PG_DATA
+          description:
+            en_us: "Container Path: /var/lib/postgresql/data"
+      volumes:
+        - container: /var/lib/postgresql/data
+          description:
+            en_us: "Container Path: /var/lib/postgresql/data"
+
+networks: # Defines network configurations for the services
+  big_bear_immich_network:
+    driver: bridge # Uses bridge network driver
+
+# CasaOS specific configuration
+x-casaos:
+  architectures: # Supported CPU architectures
+    - arm64
+  main: immich-server # Main service of the application
+  description: # Description in different languages
+    en_us: Self-hosted photo and video storage.
+  tagline: # Short description or tagline in different languages
+    en_us: Immich machine learning use rknn
+  developer: "" # Developer's name or identifier
+  author: BigBearTechWorld # Author of this configuration
+  icon: https://cdn.jsdelivr.net/gh/selfhst/icons/png/immich.png
+  # Thumbnail image (currently empty)
+  thumbnail: ""
+  # Title of the application in English
+  title:
+    en_us: Immich
+  # Application category
+  category: wxy-OEC
+  # Port mapping information
+  port_map: "2283"
