@@ -1,7 +1,7 @@
-# Configuration for big-bear-immich-rknn setup
-name: big-bear-immich-rknn
+# Configuration for immich-rknn setup
+name: immich-rknn
 
-# Service definitions for the big-bear-immich application
+# Service definitions for the immich-rknn application
 services:
   # Main Immich Server service configuration
   immich-server:
@@ -42,7 +42,7 @@ services:
 
     # Networks to be attached to the container
     networks:
-      - big_bear_immich_network
+      - immich_network
 
     x-casaos: # CasaOS specific configuration
       envs:
@@ -100,7 +100,7 @@ services:
 
     # Networks to be attached to the container
     networks:
-      - big_bear_immich_network # Connects the container to a defined network
+      - immich_network # Connects the container to a defined network
 
     x-casaos: # CasaOS specific configuration
       envs:
@@ -139,7 +139,7 @@ services:
     image: redis:6.2-alpine@sha256:70a7a5b641117670beae0d80658430853896b5ef269ccf00d1827427e3263fa3 # Image to be used
     restart: always # Policy to always restart the container if it stops
     networks:
-      - big_bear_immich_network # Connects the container to a defined network
+      - immich_network # Connects the container to a defined network
 
   # Configuration for Database service
   database:
@@ -158,7 +158,7 @@ services:
 
     # CasaOS specific configuration for the database service
     networks:
-      - big_bear_immich_network # Connects the container to a defined network
+      - immich_network # Connects the container to a defined network
 
     x-casaos: # CasaOS specific configuration
       envs:
@@ -180,7 +180,7 @@ services:
             en_us: "Container Path: /var/lib/postgresql/data"
 
 networks: # Defines network configurations for the services
-  big_bear_immich_network:
+  immich_network:
     driver: bridge # Uses bridge network driver
 
 # CasaOS specific configuration
