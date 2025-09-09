@@ -185,6 +185,7 @@ services:
 
 networks: # Defines network configurations for the services
   immich_network:
+    name: immich_network
     driver: bridge # Uses bridge network driver
 
 # CasaOS specific configuration
@@ -198,9 +199,25 @@ x-casaos:
     en_us: Immich machine learning use rknn
   developer: "" # Developer's name or identifier
   author: BigBearTechWorld # Author of this configuration
-  icon: https://cdn.jsdelivr.net/gh/selfhst/icons/png/immich.png
+  icon: https://cdn.jsdelivr.net/gh/IceWhaleTech/CasaOS-AppStore@main/Apps/Immich/icon.png
   # Thumbnail image (currently empty)
   thumbnail: ""
+  tips:
+    before_install:
+      en_us: |
+        For Chinese users...
+
+        可选：Immich 反向地理编码汉化
+
+        1.在 https://github.com/ZingLix/immich-geodata-cn 根据使用说明下载 geodata.zip 和 i18n-iso-countries.zip
+
+        2.解压并放入/DATA/AppData/$AppID
+
+        3.在immich-server容器添加下列卷映射
+
+          /DATA/AppData/$AppID/geodata:/build/geodata
+
+          /DATA/AppData/$AppID/i18n-iso-countries/langs:/usr/src/app/server/node_modules/i18n-iso-countries/langs
   # Title of the application in English
   title:
     en_us: Immich
