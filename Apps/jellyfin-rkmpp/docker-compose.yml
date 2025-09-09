@@ -31,10 +31,10 @@ services:
     restart: unless-stopped
     volumes:
       - type: bind
-        source: /DATA/AppData/jellyfin/config
+        source: /DATA/AppData/$AppID/config
         target: /config
       - type: bind
-        source: /tmp
+        source: /DATA/AppData/$AppID/cache
         target: /cache
       - type: bind
         source: /DATA/Media
@@ -50,6 +50,10 @@ services:
           description:
             en_us: Jellyfin config directory.
             zh_cn: Jellyfin配置目录
+        - container: /cache
+          description:
+            en_us: Jellyfin cache directory.
+            zh_cn: Jellyfin缓存目录
         - container: /media
           description:
             en_us: Jellyfin Media directory.
