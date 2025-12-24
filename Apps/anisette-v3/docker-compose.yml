@@ -1,0 +1,31 @@
+name: anisette-v3
+services:
+  anisette-v3:
+    image: dadoum/anisette-v3-server
+    container_name: anisette-v3
+    ports:
+      - "6969:6969"
+    volumes:
+      - /DATA/AppData/$AppID/lib:/home/Alcoholic/.config/anisette-v3/lib/
+    restart: unless-stopped
+    user: '0:0'
+
+x-casaos:
+  architectures:
+    - arm64
+  main: anisette-v3
+  store_app_id: anisette-v3
+  author: jsjllymxbl
+  category: wxy-OEC
+  developer: dadoum
+  icon: https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/apple-containers.png
+  tagline:
+    en_us: Anisette server for SideStore and AltStore.
+    zh_cn: 适用于 SideStore 和 AltStore 的 Anisette 服务器。
+  description:
+    en_us: A lighter alternative to omnisette-server. It supports both anisette-v1 and anisette-v3 protocols, used for sideloading iOS apps via SideStore or AltServer-Linux.
+    zh_cn: 一个轻量化的 anisette 服务器替代方案。支持 v1 和 v3 协议，主要用于 SideStore 或 AltServer-Linux 进行 iOS 应用签名和侧载。
+  title:
+    en_us: Anisette V3
+  port_map: "6969"
+  scheme: http
