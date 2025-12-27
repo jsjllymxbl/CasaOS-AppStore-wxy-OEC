@@ -1,15 +1,12 @@
 # Configuration for immich-rknn setup
 name: immich-rknn
-
 # Service definitions for the immich-rknn application
 services:
   # Main Immich Server service configuration
   immich-server:
     container_name: immich-server # Name of the running container
-    image: ghcr.io/immich-app/immich-server:v1.140.1 # Image to be used
-    # extends:
-    #   file: hwaccel.transcoding.yml
-    #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
+    image: ghcr.io/immich-app/immich-server:v2.3.1 # Image to be used
+    # rkmpp for accelerated transcoding
     security_opt: # enables full access to /sys and /proc, still far better than privileged: true
       - systempaths=unconfined
       - apparmor=unconfined
@@ -40,50 +37,47 @@ services:
       - redis
       - database
     restart: unless-stopped # Policy to restart unless stopped
-
     # Networks to be attached to the container
     networks:
       - immich_network
-
-    x-casaos: # CasaOS specific configuration
+    x-casaos:
       envs:
         - container: DB_HOSTNAME
           description:
-            en_us: "Database Hostname"
+            en_us: 'Container Variable: DB_HOSTNAME'
         - container: DB_USERNAME
           description:
-            en_us: "Database Username"
+            en_us: 'Container Variable: DB_USERNAME'
         - container: DB_PASSWORD
           description:
-            en_us: "Database Password"
+            en_us: 'Container Variable: DB_PASSWORD'
         - container: DB_DATABASE_NAME
           description:
-            en_us: "Database Name"
+            en_us: 'Container Variable: DB_DATABASE_NAME'
         - container: DB_PORT
           description:
-            en_us: "Database Port"
+            en_us: 'Container Variable: DB_PORT'
         - container: REDIS_HOSTNAME
           description:
-            en_us: "Redis Hostname"
+            en_us: 'Container Variable: REDIS_HOSTNAME'
         - container: IMMICH_MACHINE_LEARNING_URL
           description:
-            en_us: "Immich Machine Learning URL"
+            en_us: 'Container Variable: IMMICH_MACHINE_LEARNING_URL'
       volumes:
         - container: /usr/src/app/upload
           description:
-            en_us: "Container Path: /usr/src/app/upload"
+            en_us: 'Container Path: /usr/src/app/upload'
         - container: /DATA/Gallery
           description:
-            en_us: "Container Path: /DATA/Gallery"
+            en_us: 'Container Path: /DATA/Gallery'
       ports:
         - container: "2283"
           description:
-            en_us: "Container Port: 2283"
-
+            en_us: 'Container Port: 2283'
   # Configuration for Immich Machine Learning service
   immich-machine-learning:
     container_name: immich-machine-learning # Name of the running container
-    image: ghcr.io/immich-app/immich-machine-learning:v1.140.1-rknn # Image to be used
+    image: ghcr.io/immich-app/immich-machine-learning:v2.3.1-rknn # Image to be used
     security_opt:
       - systempaths=unconfined
       - apparmor=unconfined
@@ -101,50 +95,46 @@ services:
       MACHINE_LEARNING_RKNN: True
       MACHINE_LEARNING_RKNN_THREADS: 1
     restart: unless-stopped # Policy to restart unless stopped
-
     # Networks to be attached to the container
     networks:
       - immich_network # Connects the container to a defined network
-
-    x-casaos: # CasaOS specific configuration
+    x-casaos:
       envs:
         - container: DB_HOSTNAME
           description:
-            en_us: "Database Hostname"
+            en_us: 'Container Variable: DB_HOSTNAME'
         - container: DB_USERNAME
           description:
-            en_us: "Database Username"
+            en_us: 'Container Variable: DB_USERNAME'
         - container: DB_PASSWORD
           description:
-            en_us: "Database Password"
+            en_us: 'Container Variable: DB_PASSWORD'
         - container: DB_DATABASE_NAME
           description:
-            en_us: "Database Name"
+            en_us: 'Container Variable: DB_DATABASE_NAME'
         - container: DB_PORT
           description:
-            en_us: "Database Port"
+            en_us: 'Container Variable: DB_PORT'
         - container: REDIS_HOSTNAME
           description:
-            en_us: "Redis Hostname"
+            en_us: 'Container Variable: REDIS_HOSTNAME'
         - container: MACHINE_LEARNING_RKNN
           description:
-            en_us: "Enable RKNN hardware acceleration if supported"
+            en_us: 'Container Variable: MACHINE_LEARNING_RKNN'
         - container: MACHINE_LEARNING_RKNN_THREADS
           description:
-            en_us: "How many threads of RKNN runtime should be spinned up while inferencing."
+            en_us: 'Container Variable: MACHINE_LEARNING_RKNN_THREADS'
       volumes:
         - container: /cache
           description:
-            en_us: "Container Path: /cache"
-
+            en_us: 'Container Path: /cache'
   # Configuration for Redis service
   redis:
     container_name: immich-redis # Name of the running container
-    image: redis:6.2-alpine@sha256:70a7a5b641117670beae0d80658430853896b5ef269ccf00d1827427e3263fa3 # Image to be used
+    image: redis:6.2.20-alpine@sha256:2185e741f4c1e7b0ea9ca1e163a3767c4270a73086b6bbea2049a7203212fb7f # patched for CVE-2025-49844
     restart: always # Policy to always restart the container if it stops
     networks:
       - immich_network # Connects the container to a defined network
-
   # Configuration for Database service
   database:
     container_name: immich-postgres # Name of the running container
@@ -159,55 +149,58 @@ services:
     volumes: # Mounting directories for persistent data storage
       - /DATA/AppData/$AppID/pgdata:/var/lib/postgresql/data
     restart: unless-stopped # Policy to always restart the container if it stops
-
     # CasaOS specific configuration for the database service
     networks:
       - immich_network # Connects the container to a defined network
-
-    x-casaos: # CasaOS specific configuration
+    x-casaos:
       envs:
         - container: POSTGRES_PASSWORD
           description:
-            en_us: "Database Password"
+            en_us: 'Container Variable: POSTGRES_PASSWORD'
         - container: POSTGRES_USER
           description:
-            en_us: "Database Username"
+            en_us: 'Container Variable: POSTGRES_USER'
         - container: POSTGRES_DB
           description:
-            en_us: "Database Name"
+            en_us: 'Container Variable: POSTGRES_DB'
         - container: PG_DATA
           description:
-            en_us: "Container Path: /var/lib/postgresql/data"
+            en_us: 'Container Variable: PG_DATA'
       volumes:
         - container: /var/lib/postgresql/data
           description:
-            en_us: "Container Path: /var/lib/postgresql/data"
-
-networks: # Defines network configurations for the services
+            en_us: 'Container Path: /var/lib/postgresql/data'
+networks: 
+  # Defines network configurations for the services
   immich_network:
-    name: immich_network
     driver: bridge # Uses bridge network driver
-
-# CasaOS specific configuration
 x-casaos:
-  architectures: # Supported CPU architectures
+  # Supported CPU architectures for this application
+  architectures:
     - arm64
-  main: immich-server # Main service of the application
-  description: # Description in different languages
+  # Main service for this application
+  main: immich-server
+  # Detailed description for the application
+  description:
     en_us: Self-hosted photo and video storage.
-  tagline: # Short description or tagline in different languages
-    en_us: Immich machine learning use rknn
-  developer: "" # Developer's name or identifier
-  author: BigBearTechWorld # Author of this configuration
+  # Brief tagline for the application
+  tagline:
+    en_us: Immich using RKNN for machine learning
+  # Developer's information
+  developer: immich-app
+  # Author of this particular configuration
+  author: BigBearTechWorld & jsjllymxbl
+  # Icon URL for the application
   icon: https://cdn.jsdelivr.net/gh/IceWhaleTech/CasaOS-AppStore@main/Apps/Immich/icon.png
-  # Thumbnail image (currently empty)
+  # Thumbnail image for the application (if any)
   thumbnail: ""
+  # Tips for the application
   tips:
     before_install:
       en_us: |
         For Chinese users...
 
-        可选：Immich 反向地理编码汉化
+        可选: Immich 反向地理编码汉化
 
         1.在 https://github.com/ZingLix/immich-geodata-cn 根据使用说明下载 geodata.zip 和 i18n-iso-countries.zip
 
@@ -218,10 +211,10 @@ x-casaos:
           /DATA/AppData/$AppID/geodata:/build/geodata
 
           /DATA/AppData/$AppID/i18n-iso-countries/langs:/usr/src/app/server/node_modules/i18n-iso-countries/langs
-  # Title of the application in English
+  # Title for the application
   title:
     en_us: Immich
-  # Application category
+  # Category under which the application falls
   category: wxy-OEC
-  # Port mapping information
+  # Default port mapping for the application
   port_map: "2283"
