@@ -5,7 +5,7 @@ services:
   # Main Immich Server service configuration
   immich-server:
     container_name: immich-server # Name of the running container
-    image: ghcr.io/immich-app/immich-server:v2.3.1 # Image to be used
+    image: ghcr.io/immich-app/immich-server:v2.4.1 # Image to be used
     # rkmpp for accelerated transcoding
     security_opt: # enables full access to /sys and /proc, still far better than privileged: true
       - systempaths=unconfined
@@ -77,7 +77,7 @@ services:
   # Configuration for Immich Machine Learning service
   immich-machine-learning:
     container_name: immich-machine-learning # Name of the running container
-    image: ghcr.io/immich-app/immich-machine-learning:v2.3.1-rknn # Image to be used
+    image: ghcr.io/immich-app/immich-machine-learning:v2.4.1-rknn # Image to be used
     security_opt:
       - systempaths=unconfined
       - apparmor=unconfined
