@@ -1,0 +1,24 @@
+server:
+  database: "/config/database.db"
+  cacheDir: "/tmp"
+  sources:
+    - path: "/srv/AppData"
+      name: "AppData"
+      config:
+        defaultEnabled: true
+    - path: "/srv/Documents"
+      name: "Documents"
+      config:
+        defaultEnabled: true
+    - path: "/srv/Downloads"
+      name: "Downloads"
+      config:
+        defaultEnabled: true
+    - path: "/srv/Gallery"
+      name: "Gallery"
+      config:
+        defaultEnabled: true
+    - path: "/srv/Media"
+      name: "Media"
+      config:
+        defaultEnabled: true

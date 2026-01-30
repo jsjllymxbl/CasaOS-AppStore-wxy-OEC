@@ -3,15 +3,20 @@ services:
   filebrowser-quantum:
     image: gtstef/filebrowser:stable
     container_name: filebrowser-quantum
+    user: 0:0
+    environment:
+      FILEBROWSER_CONFIG: "/config/config.yaml"
+      FILEBROWSER_ADMIN_PASSWORD: admin
     ports:
       - "10180:80"
     volumes:
-      - /DATA/AppData:/AppData
-      - /DATA/Documents:/Documents
-      - /DATA/Downloads:/Downloads
-      - /DATA/Gallery:/Gallery
-      - /DATA/Media:/Media
-      - /DATA/AppData/filebrowser-quantum/config.yaml:/home/filebrowser/config.yaml:ro
+      - /DATA/AppData:/srv/AppData
+      - /DATA/Documents:/srv/Documents
+      - /DATA/Downloads:/srv/Downloads
+      - /DATA/Gallery:/srv/Gallery
+      - /DATA/Media:/srv/Media
+      - /DATA/AppData/filebrowser-quantum/config:/config
+      - /DATA/AppData/filebrowser-quantum/tmp:/tmp
     restart: unless-stopped
 
 x-casaos:
@@ -24,11 +29,11 @@ x-casaos:
   developer: gtsteffaniak
   icon: https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/filebrowser-quantum.png
   tagline:
-    en_us: A modern web file browser with enhanced features
-    zh_cn: 具有增强功能的现代网页文件浏览器
+    en_us: A modern web-based file manager
+    zh_cn: 现代网页文件管理器
   description:
-    en_us: FileBrowser Quantum is a modern web-based file manager that provides file browsing, uploading, downloading, and sharing capabilities. It supports multiple storage backends and offers a clean, responsive interface for managing files directly from your browser.
-    zh_cn: FileBrowser Quantum 是一个现代的网页文件管理器，提供文件浏览、上传、下载和共享功能。支持多种存储后端，提供简洁的响应式界面，可直接从浏览器管理文件。
+    en_us: FileBrowser Quantum is a modern web-based file manager that provides file browsing, uploading, downloading, and sharing capabilities. It offers a clean, responsive interface for managing files directly from your browser with enhanced performance and features.
+    zh_cn: FileBrowser Quantum 是一个现代化的网页文件管理器，提供文件浏览、上传、下载和共享功能。提供简洁的响应式界面，可直接从浏览器管理文件，具有增强的性能和功能特性。
   tips:
     before_install:
       en_us: |
@@ -36,13 +41,23 @@ x-casaos:
         - Username: `admin`
         - Password: `admin`
 
-        Please change the password after first login for security.
+        Configuration file: `/DATA/AppData/filebrowser-quantum/config/config.yaml`
+
+        Startup failed. Please add the configuration file first: 
+        [config.yaml](https://github.com/jsjllymxbl/CasaOS-AppStore-wxy-OEC/blob/main/Apps/filebrowser-quantum/config.yaml)
+
+        Configuration reference: [config.generated.yaml](https://github.com/gtsteffaniak/filebrowser/blob/main/frontend/public/config.generated.yaml)
       zh_cn: |
         默认登录凭证：
         - 用户名：`admin`
         - 密码：`admin`
 
-        出于安全考虑，请在首次登录后修改密码。
+        配置文件路径：`/DATA/AppData/filebrowser-quantum/config/config.yaml`
+
+        启动失败，请先添加配置文件：
+        [config.yaml](https://github.com/jsjllymxbl/CasaOS-AppStore-wxy-OEC/blob/main/Apps/filebrowser-quantum/config.yaml)
+
+        配置参考：[config.generated.yaml](https://github.com/gtsteffaniak/filebrowser/blob/main/frontend/public/config.generated.yaml)
   title:
     en_us: FileBrowser Quantum
   port_map: "10180"
