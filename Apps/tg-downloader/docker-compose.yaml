@@ -1,0 +1,85 @@
+name: tg-downloader
+services:
+  telegram_media_downloader:
+    image: tangyoha/telegram_media_downloader:latest
+    ports:
+      # Here is what you need to edit
+      - "5000:5000"
+    #environment:
+    #  - http_proxy=http://192.168.101.30:10811
+    #  - https_proxy=http://192.168.101.30:10811
+    volumes:
+      # Here is what you need to edit
+      - "/DATA/Downloads/:/app/downloads/"
+
+      # Rclone
+      - "/DATA/AppData/tg-downloader/rclone/:$HOME/.config/rclone/"
+
+      # The following is what you don't need to edit
+      - "/DATA/AppData/tg-downloader/config.yaml:/app/config.yaml"
+      - "/DATA/AppData/tg-downloader/data.yaml:/app/data.yaml"
+      - "/DATA/AppData/tg-downloader/log/:/app/log/"
+      - "/DATA/AppData/tg-downloader/sessions/:/app/sessions"
+      - "/DATA/AppData/tg-downloader/temp/:/app/temp"
+    #restart: "unless-stopped"
+
+x-casaos:
+  architectures:
+    - arm64
+  main: telegram_media_downloader
+  store_app_id: tg-downloader
+  author: jsjllymxbl
+  category: wxy-OEC
+  developer: tangyoha
+  icon: https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/telegram.png
+  tips:
+    before_install:
+      en_us: |
+        1. Download configuration files:
+           ```bash
+           mkdir -p /DATA/AppData/tg-downloader
+           wget https://raw.githubusercontent.com/tangyoha/telegram_media_downloader/master/config.yaml -O /DATA/AppData/tg-downloader/config.yaml
+           wget https://raw.githubusercontent.com/tangyoha/telegram_media_downloader/master/data.yaml -O /DATA/AppData/tg-downloader/data.yaml
+           ```
+
+        2. Configure according to [project documentation](https://github.com/tangyoha/telegram_media_downloader)
+
+        3. First login with phone number (run once after installation):
+           ```bash
+           cd /var/lib/casaos/apps/tg-downloader
+           docker compose run --rm telegram_media_downloader
+           ```
+
+        4. Restart the container via CasaOS after login completes
+
+        5. Note: Without bot_token configured, the program will automatically stop after downloading tasks. With bot_token configured, it will keep running and wait for tasks sent by bot.
+      zh_cn: |
+        1. 下载配置文件：
+           ```bash
+           mkdir -p /DATA/AppData/tg-downloader
+           wget https://raw.githubusercontent.com/tangyoha/telegram_media_downloader/master/config.yaml -O /DATA/AppData/tg-downloader/config.yaml
+           wget https://raw.githubusercontent.com/tangyoha/telegram_media_downloader/master/data.yaml -O /DATA/AppData/tg-downloader/data.yaml
+           ```
+
+        2. 参考[项目文档](https://github.com/tangyoha/telegram_media_downloader)进行配置
+
+        3. 安装完成后需前台运行一次，登录手机号：
+           ```bash
+           cd /var/lib/casaos/apps/tg-downloader
+           docker compose run --rm telegram_media_downloader
+           ```
+
+        4. 登录完成后通过 CasaOS 重启容器
+
+        5. 注意：未配置 bot_token 的话，程序会在完成下载任务后自动停止。配置 bot_token 后会一直运行，等待下载 bot 发送的任务
+
+  tagline:
+    en_us: Download media files from Telegram channels
+    zh_cn: 从 Telegram 频道下载媒体文件
+  description:
+    en_us: A Telegram media downloader that can automatically download photos, videos, documents and other media files from Telegram channels and chats. Supports Rclone integration for automatic upload to various cloud storage services.
+    zh_cn: Telegram 媒体下载器，可以自动从 Telegram 频道和聊天中下载照片、视频、文档等媒体文件。支持 Rclone 集成，可自动上传到各种云存储服务。
+  title:
+    en_us: Telegram Media Downloader
+  port_map: "5000"
+  scheme: http
