@@ -25,7 +25,6 @@ x-casaos:
   architectures:
     - arm64
   main: openlist
-  store_app_id: openlist
   author: Cp0204
   category: wxy-OEC
   description:
