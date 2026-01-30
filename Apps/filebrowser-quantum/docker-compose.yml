@@ -1,0 +1,49 @@
+name: filebrowser-quantum
+services:
+  filebrowser-quantum:
+    image: gtstef/filebrowser:stable
+    container_name: filebrowser-quantum
+    ports:
+      - "10180:80"
+    volumes:
+      - /DATA/AppData:/AppData
+      - /DATA/Documents:/Documents
+      - /DATA/Downloads:/Downloads
+      - /DATA/Gallery:/Gallery
+      - /DATA/Media:/Media
+      - /DATA/AppData/filebrowser-quantum/config.yaml:/home/filebrowser/config.yaml:ro
+    restart: unless-stopped
+
+x-casaos:
+  architectures:
+    - arm64
+  main: filebrowser-quantum
+  store_app_id: filebrowser-quantum
+  author: jsjllymxbl
+  category: wxy-OEC
+  developer: gtsteffaniak
+  icon: https://cdn.jsdelivr.net/gh/selfhst/icons@main/png/filebrowser-quantum.png
+  tagline:
+    en_us: A modern web file browser with enhanced features
+    zh_cn: 具有增强功能的现代网页文件浏览器
+  description:
+    en_us: FileBrowser Quantum is a modern web-based file manager that provides file browsing, uploading, downloading, and sharing capabilities. It supports multiple storage backends and offers a clean, responsive interface for managing files directly from your browser.
+    zh_cn: FileBrowser Quantum 是一个现代的网页文件管理器，提供文件浏览、上传、下载和共享功能。支持多种存储后端，提供简洁的响应式界面，可直接从浏览器管理文件。
+  tips:
+    before_install:
+      en_us: |
+        Default credentials:
+        - Username: `admin`
+        - Password: `admin`
+
+        Please change the password after first login for security.
+      zh_cn: |
+        默认登录凭证：
+        - 用户名：`admin`
+        - 密码：`admin`
+
+        出于安全考虑，请在首次登录后修改密码。
+  title:
+    en_us: FileBrowser Quantum
+  port_map: "10180"
+  scheme: http
