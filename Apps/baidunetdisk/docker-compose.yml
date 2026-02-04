@@ -1,4 +1,5 @@
-name: baidunetdisk
+# Add the suffix _wxy to avoid duplicate names.
+name: baidunetdisk_wxy
 services:
   baidunetdisk:
     image: johngong/baidunetdisk:latest
@@ -12,7 +13,7 @@ services:
       - 5900:5900
     volumes:
       - /DATA/AppData/baidunetdisk/config:/config
-      - /DATA/Downloads:/config/Downloads
+      - /DATA/Downloads/baidunetdisk:/config/Downloads
     environment:
       - VNC_PASSWORD=vncpassword
     restart: unless-stopped

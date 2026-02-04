@@ -1,4 +1,5 @@
-name: openlist
+# Add the suffix _wxy to avoid duplicate names.
+name: openlist_wxy
 services:
   openlist:
     image: openlistteam/openlist:latest
@@ -10,7 +11,7 @@ services:
         reservations:
           memory: 64M
     volumes:
-      - /DATA/AppData/$AppID/data:/opt/openlist/data
+      - /DATA/AppData/openlist/data:/opt/openlist/data
     ports:
       - 5244:5244
     environment:
